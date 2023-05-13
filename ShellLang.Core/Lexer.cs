@@ -6,35 +6,33 @@ namespace ShellLang.Core
 {
     public class Lexer
     {
-        private StreamReader _sourceReader { get; set; }
+        private IEnumerator<char> _symbols;
         private Dictionary<string, Tag> _reservedWords = new Dictionary<string, Tag>();
 
-        private char _peek { get; set; } = char.MinValue;
-
-        public Lexer(Stream source, Dictionary<string, Tag> reservedWords)
+        public Lexer(IEnumerator<char> symbols, Dictionary<string, Tag> reservedWords)
         {
-            _sourceReader = new StreamReader(source);
+            _symbols = symbols;
             _reservedWords = reservedWords;
         }
 
         public IEnumerable<KeyValuePair<string, Tag>> GetTokens()
         {
-            while (_peek != char.MinValue)
+            while (_symbols.Current != char.MinValue)
             {
                 var wordBuilder = new StringBuilder();
 
-                if (char.IsWhiteSpace(_peek) || _peek == '\n')
+                if (char.IsWhiteSpace(_symbols.Current) || _symbols.Current == '\n')
                 {
-                    _peek = (char)_sourceReader.Read();
+                    _symbols.MoveNext();
                     continue;
                 }
 
-                if (char.IsLetter(_peek))
+                if (char.IsLetter(_symbols.Current))
                 {
-                    while (char.IsLetterOrDigit(_peek))
+                    while (char.IsLetterOrDigit(_symbols.Current))
                     {
-                        wordBuilder.Append(_peek);
-                        _peek = (char)_sourceReader.Read();
+                        wordBuilder.Append(_symbols.Current);
+                        _symbols.MoveNext();
                     }
 
                     string word = wordBuilder.ToString();
@@ -43,73 +41,74 @@ namespace ShellLang.Core
                         : new KeyValuePair<string, Tag>(word, Tag.IDENTIFIER);
                 }
 
-                if (char.IsDigit(_peek))
+                if (char.IsDigit(_symbols.Current))
                 {
-                    while (char.IsDigit(_peek))
+                    while (char.IsDigit(_symbols.Current))
                     {
-                        wordBuilder.Append(_peek);
-                        _peek = (char)_sourceReader.Read();
+                        wordBuilder.Append(_symbols.Current);
+                        _symbols.MoveNext();
                     }
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.LITERAL);
                 }
 
-                if (_peek == '\"')
+                if (_symbols.Current == '\"')
                 {
-                    _peek = (char)_sourceReader.Read();
-                    while (_peek != '\"' && !_sourceReader.EndOfStream)
+                    bool isEnd = _symbols.MoveNext();
+                    while (_symbols.Current != '\"' && !isEnd)
                     {
-                        wordBuilder.Append(_peek);
-                        _peek = (char)_sourceReader.Read();
+                        wordBuilder.Append(_symbols.Current);
+                        isEnd = _symbols.MoveNext();
                     }
 
-                    if (_sourceReader.EndOfStream) //TODO: Exception! Unfinished string.
+                    if (isEnd)
                         throw new LexerException("Unfinished string!");
 
-                    wordBuilder.Append(_peek);
+                    wordBuilder.Append(_symbols.Current);
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
-                    _peek = (char)_sourceReader.Read();
+                    _symbols.MoveNext();
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.LITERAL);
                 }
 
-                if (_peek == ';'
-                    || _peek == '{'
-                    || _peek == '}'
-                    || _peek == '('
-                    || _peek == ')')
+                if (_symbols.Current == ';'
+                    || _symbols.Current == '{'
+                    || _symbols.Current == '}'
+                    || _symbols.Current == '('
+                    || _symbols.Current == ')')
                 {
-                    wordBuilder.Append(_peek);
-                    _peek = (char)_sourceReader.Read();
+                    wordBuilder.Append(_symbols.Current);
+                    _symbols.MoveNext();
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.SEPARATOR);
                 }
 
-                if (_peek == '>'
-                    || _peek == '<'
-                    || _peek == '='
-                    || _peek == '+'
-                    || _peek == '-')
+                if (_symbols.Current == '>'
+                    || _symbols.Current == '<'
+                    || _symbols.Current == '='
+                    || _symbols.Current == '+'
+                    || _symbols.Current == '-')
                 {
-                    wordBuilder.Append(_peek);
-                    _peek = (char)_sourceReader.Read();
+                    wordBuilder.Append(_symbols.Current);
+                    _symbols.MoveNext();
 
-                    if (_peek == '=')
+                    if (_symbols.Current == '=')
                     {
-                        wordBuilder.Append(_peek);
-                        _peek = (char)_sourceReader.Read();
+                        wordBuilder.Append(_symbols.Current);
+                        _symbols.MoveNext();
                     }
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BINARYOPERATOR);
                 }
 
-                if (_peek == '#')
+                if (_symbols.Current == '#')
                 {
-                    while (_peek != '\n')
-                        _peek = (char)_sourceReader.Read();
+                    while (_symbols.Current != '\n')
+                        _symbols.MoveNext();
+
+                    continue;
                 }
 
-                //TODO: Exception! Unknown lexeme encountered.
                 throw new LexerException("Unknown lexeme encountered.");
             }
         }
