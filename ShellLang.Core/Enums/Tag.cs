@@ -2,12 +2,12 @@
 {
     public enum Tag
     {
-        TYPE,
-        LITERAL,
-        IDENTIFIER,
-        BINARYOPERATOR,
-        UNARYOPERATOR,
-        KEYWORD,
-        SEPARATOR
+        Type,
+        Literal,
+        Identifier,
+        BinaryOperator,
+        UnaryOperator,
+        Keyword,
+        Separator
     }
 }

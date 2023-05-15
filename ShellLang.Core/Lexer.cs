@@ -40,7 +40,7 @@ namespace ShellLang.Core
                     string word = wordBuilder.ToString();
                     yield return _reservedWords.ContainsKey(word)
                         ? new KeyValuePair<string, Tag>(word, _reservedWords[word])
-                        : new KeyValuePair<string, Tag>(word, Tag.IDENTIFIER);
+                        : new KeyValuePair<string, Tag>(word, Tag.Identifier);
                 }
 
                 if (char.IsDigit(_peek))
@@ -51,7 +51,7 @@ namespace ShellLang.Core
                         _peek = (char)_sourceReader.Read();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.LITERAL);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
                 }
 
                 if (_peek == '\"')
@@ -70,7 +70,7 @@ namespace ShellLang.Core
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
                     _peek = (char)_sourceReader.Read();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.LITERAL);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
                 }
 
                 if (_peek == ';'
@@ -82,7 +82,7 @@ namespace ShellLang.Core
                     wordBuilder.Append(_peek);
                     _peek = (char)_sourceReader.Read();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.SEPARATOR);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Separator);
                 }
 
                 if (_peek == '>'
@@ -100,7 +100,7 @@ namespace ShellLang.Core
                         _peek = (char)_sourceReader.Read();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BINARYOPERATOR);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BinaryOperator);
                 }
 
                 if (_peek == '#')
