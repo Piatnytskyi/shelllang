@@ -3,15 +3,20 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace ShellLang.Core.Models
 {
-    public struct Variable
+    public struct Variable : IEquatable<Variable>
     {
-        public string Identifier { get; }
+        public readonly string Identifier { get; }
         public Entity Entity { get; set; }
 
         public Variable(string identifier, Entity entity)
         {
             Identifier = identifier;
             Entity = entity;
+        }
+
+        public bool Equals(Variable other)
+        {
+            return Identifier.Equals(other.Identifier);
         }
 
         public override int GetHashCode()
@@ -24,9 +29,7 @@ namespace ShellLang.Core.Models
             if (obj == null || !(obj is Variable))
                 return false;
 
-            var other = (Variable)obj;
-
-            return Identifier.Equals(other.Identifier);
+            return Equals((Variable)obj);
         }
     }
 }
