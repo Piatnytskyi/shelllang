@@ -1,4 +1,4 @@
-﻿using ShellLang.Core.Enums;
+﻿
 using System.Diagnostics.CodeAnalysis;
 
 namespace ShellLang.Core.Models
@@ -6,9 +6,9 @@ namespace ShellLang.Core.Models
     public struct Variable
     {
         public string Identifier { get; }
-        public (string, PrimitiveType) Value { get; set; }
+        public Object Value { get; set; }
 
-        public Variable(string identifier, (string, PrimitiveType) value)
+        public Variable(string identifier, Object value)
         {
             Identifier = identifier;
             Value = value;
