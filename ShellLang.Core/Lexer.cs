@@ -38,7 +38,7 @@ namespace ShellLang.Core
                     }
 
                     string word = wordBuilder.ToString();
-                    var potentialIdentifier = new Token(word, Tag.Identifier);
+                    var potentialIdentifier = new Token(word, TokenType.Identifier);
                     Token actual;
                     yield return _reservedWords.TryGetValue(potentialIdentifier, out actual)
                         ? actual
@@ -53,7 +53,7 @@ namespace ShellLang.Core
                         isEndReached = _symbols.MoveNext();
                     }
 
-                    yield return new Token(wordBuilder.ToString(), Tag.Literal);
+                    yield return new Token(wordBuilder.ToString(), TokenType.Literal);
                 }
 
                 if (_symbols.Current == '\"')
@@ -72,7 +72,7 @@ namespace ShellLang.Core
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
                     isEndReached = _symbols.MoveNext();
 
-                    yield return new Token(wordBuilder.ToString(), Tag.Literal);
+                    yield return new Token(wordBuilder.ToString(), TokenType.Literal);
                 }
 
                 if (_symbols.Current == ';'
@@ -84,7 +84,7 @@ namespace ShellLang.Core
                     wordBuilder.Append(_symbols.Current);
                     isEndReached = _symbols.MoveNext();
 
-                    yield return new Token(wordBuilder.ToString(), Tag.Separator);
+                    yield return new Token(wordBuilder.ToString(), TokenType.Separator);
                 }
 
                 if (_symbols.Current == '>'
@@ -102,7 +102,7 @@ namespace ShellLang.Core
                         isEndReached = _symbols.MoveNext();
                     }
 
-                    yield return new Token(wordBuilder.ToString(), Tag.BinaryOperator);
+                    yield return new Token(wordBuilder.ToString(), TokenType.BinaryOperator);
                 }
 
                 if (_symbols.Current == '#')

@@ -6,9 +6,9 @@ namespace ShellLang.Core.Models
     public struct Token : IEquatable<Token>
     {
         public string Value { get; set; }
-        public Tag Type { get; set; }
+        public TokenType Type { get; set; }
 
-        public Token(string value, Tag type)
+        public Token(string value, TokenType type)
         {
             Value = value;
             Type = type;
