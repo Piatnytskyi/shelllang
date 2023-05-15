@@ -1,21 +1,25 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using ShellLang.Core.Nodes;
+using ShellLang.Core.Nodes.Statements;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ShellLang.Core.Models
 {
     public struct Function : IEquatable<Function>
     {
         public readonly string Identifier { get; }
-        public readonly Variable[] Parameters { get; }
+        public readonly Declaration[] ParametersDeclarations { get; }
+        public readonly BodyComposite Body { get; }
 
-        public Function(string identifier, Variable[] parameters)
+        public Function(string identifier, Declaration[] parameters, BodyComposite body)
         {
             Identifier = identifier;
-            Parameters = parameters;
+            ParametersDeclarations = parameters;
+            Body = body;
         }
 
         public bool Equals(Function other)
         {
-            return Identifier.Equals(other.Identifier) && Enumerable.SequenceEqual(Parameters, other.Parameters);
+            return Identifier.Equals(other.Identifier) && Enumerable.SequenceEqual(ParametersDeclarations, other.ParametersDeclarations);
         }
 
         public override int GetHashCode()
@@ -23,7 +27,7 @@ namespace ShellLang.Core.Models
             var hashCode = new HashCode();
             hashCode.Add(Identifier);
 
-            foreach (var parameter in Parameters)
+            foreach (var parameter in ParametersDeclarations)
                 hashCode.Add(parameter.GetHashCode());
 
             return hashCode.ToHashCode();
