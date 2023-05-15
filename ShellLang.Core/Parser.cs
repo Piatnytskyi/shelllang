@@ -1,13 +1,13 @@
-﻿using ShellLang.Core.Enums;
+﻿using ShellLang.Core.Models;
 using ShellLang.Core.Nodes;
 
 namespace ShellLang.Core
 {
     public class Parser
     {
-        private readonly IEnumerable<KeyValuePair<string, Tag>> _tokens;
+        private readonly IEnumerator<Token> _tokens;
 
-        public Parser(IEnumerable<KeyValuePair<string, Tag>> tokens)
+        public Parser(IEnumerator<Token> tokens)
         {
             _tokens = tokens;
         }

@@ -1,21 +1,22 @@
 ﻿using ShellLang.Core.Enums;
 using ShellLang.Core.Exceptions;
+using ShellLang.Core.Models;
 using System.Text;
 
 namespace ShellLang.Core
 {
     public class Lexer
     {
-        private IEnumerator<char> _symbols;
-        private Dictionary<string, Tag> _reservedWords = new Dictionary<string, Tag>();
+        private readonly IEnumerator<char> _symbols;
+        private readonly HashSet<Token> _reservedWords = new HashSet<Token>();
 
-        public Lexer(IEnumerator<char> symbols, Dictionary<string, Tag> reservedWords)
+        public Lexer(IEnumerator<char> symbols, HashSet<Token> reservedWords)
         {
             _symbols = symbols;
             _reservedWords = reservedWords;
         }
 
-        public IEnumerable<KeyValuePair<string, Tag>> GetTokens()
+        public IEnumerable<Token> GetTokens()
         {
             bool isEndReached = false;
             while (isEndReached)
@@ -37,9 +38,11 @@ namespace ShellLang.Core
                     }
 
                     string word = wordBuilder.ToString();
-                    yield return _reservedWords.ContainsKey(word)
-                        ? new KeyValuePair<string, Tag>(word, _reservedWords[word])
-                        : new KeyValuePair<string, Tag>(word, Tag.Identifier);
+                    var potentialIdentifier = new Token(word, Tag.Identifier);
+                    Token actual;
+                    yield return _reservedWords.TryGetValue(potentialIdentifier, out actual)
+                        ? actual
+                        : potentialIdentifier;
                 }
 
                 if (char.IsDigit(_symbols.Current))
@@ -50,7 +53,7 @@ namespace ShellLang.Core
                         isEndReached = _symbols.MoveNext();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
+                    yield return new Token(wordBuilder.ToString(), Tag.Literal);
                 }
 
                 if (_symbols.Current == '\"')
@@ -69,7 +72,7 @@ namespace ShellLang.Core
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
                     isEndReached = _symbols.MoveNext();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
+                    yield return new Token(wordBuilder.ToString(), Tag.Literal);
                 }
 
                 if (_symbols.Current == ';'
@@ -81,7 +84,7 @@ namespace ShellLang.Core
                     wordBuilder.Append(_symbols.Current);
                     isEndReached = _symbols.MoveNext();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Separator);
+                    yield return new Token(wordBuilder.ToString(), Tag.Separator);
                 }
 
                 if (_symbols.Current == '>'
@@ -99,7 +102,7 @@ namespace ShellLang.Core
                         isEndReached = _symbols.MoveNext();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BinaryOperator);
+                    yield return new Token(wordBuilder.ToString(), Tag.BinaryOperator);
                 }
 
                 if (_symbols.Current == '#')
