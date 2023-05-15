@@ -38,7 +38,7 @@ namespace ShellLang.Core
                     string word = wordBuilder.ToString();
                     yield return _reservedWords.ContainsKey(word)
                         ? new KeyValuePair<string, Tag>(word, _reservedWords[word])
-                        : new KeyValuePair<string, Tag>(word, Tag.IDENTIFIER);
+                        : new KeyValuePair<string, Tag>(word, Tag.Identifier);
                 }
 
                 if (char.IsDigit(_symbols.Current))
@@ -49,7 +49,7 @@ namespace ShellLang.Core
                         _symbols.MoveNext();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.LITERAL);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
                 }
 
                 if (_symbols.Current == '\"')
@@ -68,7 +68,7 @@ namespace ShellLang.Core
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
                     _symbols.MoveNext();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.LITERAL);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
                 }
 
                 if (_symbols.Current == ';'
@@ -80,7 +80,7 @@ namespace ShellLang.Core
                     wordBuilder.Append(_symbols.Current);
                     _symbols.MoveNext();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.SEPARATOR);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Separator);
                 }
 
                 if (_symbols.Current == '>'
@@ -98,7 +98,7 @@ namespace ShellLang.Core
                         _symbols.MoveNext();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BINARYOPERATOR);
+                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BinaryOperator);
                 }
 
                 if (_symbols.Current == '#')
