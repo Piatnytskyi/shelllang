@@ -6,12 +6,12 @@ namespace ShellLang.Core.Models
     public struct Variable
     {
         public string Identifier { get; }
-        public Object Value { get; set; }
+        public Entity Entity { get; set; }
 
-        public Variable(string identifier, Object value)
+        public Variable(string identifier, Entity entity)
         {
             Identifier = identifier;
-            Value = value;
+            Entity = entity;
         }
 
         public override int GetHashCode()
