@@ -17,13 +17,14 @@ namespace ShellLang.Core
 
         public IEnumerable<KeyValuePair<string, Tag>> GetTokens()
         {
-            while (_symbols.Current != char.MinValue)
+            bool isEndReached = false;
+            while (isEndReached)
             {
                 var wordBuilder = new StringBuilder();
 
                 if (char.IsWhiteSpace(_symbols.Current) || _symbols.Current == '\n')
                 {
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
                     continue;
                 }
 
@@ -32,7 +33,7 @@ namespace ShellLang.Core
                     while (char.IsLetterOrDigit(_symbols.Current))
                     {
                         wordBuilder.Append(_symbols.Current);
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
                     string word = wordBuilder.ToString();
@@ -46,7 +47,7 @@ namespace ShellLang.Core
                     while (char.IsDigit(_symbols.Current))
                     {
                         wordBuilder.Append(_symbols.Current);
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
@@ -54,19 +55,19 @@ namespace ShellLang.Core
 
                 if (_symbols.Current == '\"')
                 {
-                    bool isEnd = _symbols.MoveNext();
-                    while (_symbols.Current != '\"' && !isEnd)
+                    isEndReached = _symbols.MoveNext();
+                    while (_symbols.Current != '\"' && !isEndReached)
                     {
                         wordBuilder.Append(_symbols.Current);
-                        isEnd = _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
-                    if (isEnd)
+                    if (isEndReached)
                         throw new LexerException("Unfinished string!");
 
                     wordBuilder.Append(_symbols.Current);
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
                 }
@@ -78,7 +79,7 @@ namespace ShellLang.Core
                     || _symbols.Current == ')')
                 {
                     wordBuilder.Append(_symbols.Current);
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Separator);
                 }
@@ -90,12 +91,12 @@ namespace ShellLang.Core
                     || _symbols.Current == '-')
                 {
                     wordBuilder.Append(_symbols.Current);
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
 
                     if (_symbols.Current == '=')
                     {
                         wordBuilder.Append(_symbols.Current);
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
                     yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BinaryOperator);
@@ -104,7 +105,7 @@ namespace ShellLang.Core
                 if (_symbols.Current == '#')
                 {
                     while (_symbols.Current != '\n')
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
 
                     continue;
                 }
