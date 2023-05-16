@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Lexical\Factories\" />
+    <Folder Include="Lexical\Factories\Tokens\" />
+  </ItemGroup>
+
 </Project>
