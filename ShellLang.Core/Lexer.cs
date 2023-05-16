@@ -1,29 +1,31 @@
 ﻿using ShellLang.Core.Enums;
 using ShellLang.Core.Exceptions;
+using ShellLang.Core.Models;
 using System.Text;
 
 namespace ShellLang.Core
 {
     public class Lexer
     {
-        private IEnumerator<char> _symbols;
-        private Dictionary<string, Tag> _reservedWords = new Dictionary<string, Tag>();
+        private readonly IEnumerator<char> _symbols;
+        private readonly HashSet<Token> _reservedWords = new HashSet<Token>();
 
-        public Lexer(IEnumerator<char> symbols, Dictionary<string, Tag> reservedWords)
+        public Lexer(IEnumerator<char> symbols, HashSet<Token> reservedWords)
         {
             _symbols = symbols;
             _reservedWords = reservedWords;
         }
 
-        public IEnumerable<KeyValuePair<string, Tag>> GetTokens()
+        public IEnumerable<Token> GetTokens()
         {
-            while (_symbols.Current != char.MinValue)
+            bool isEndReached = false;
+            while (isEndReached)
             {
                 var wordBuilder = new StringBuilder();
 
                 if (char.IsWhiteSpace(_symbols.Current) || _symbols.Current == '\n')
                 {
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
                     continue;
                 }
 
@@ -32,13 +34,15 @@ namespace ShellLang.Core
                     while (char.IsLetterOrDigit(_symbols.Current))
                     {
                         wordBuilder.Append(_symbols.Current);
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
                     string word = wordBuilder.ToString();
-                    yield return _reservedWords.ContainsKey(word)
-                        ? new KeyValuePair<string, Tag>(word, _reservedWords[word])
-                        : new KeyValuePair<string, Tag>(word, Tag.Identifier);
+                    var potentialIdentifier = new Token(word, TokenType.Identifier);
+                    Token actual;
+                    yield return _reservedWords.TryGetValue(potentialIdentifier, out actual)
+                        ? actual
+                        : potentialIdentifier;
                 }
 
                 if (char.IsDigit(_symbols.Current))
@@ -46,29 +50,29 @@ namespace ShellLang.Core
                     while (char.IsDigit(_symbols.Current))
                     {
                         wordBuilder.Append(_symbols.Current);
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
+                    yield return new Token(wordBuilder.ToString(), TokenType.Literal);
                 }
 
                 if (_symbols.Current == '\"')
                 {
-                    bool isEnd = _symbols.MoveNext();
-                    while (_symbols.Current != '\"' && !isEnd)
+                    isEndReached = _symbols.MoveNext();
+                    while (_symbols.Current != '\"' && !isEndReached)
                     {
                         wordBuilder.Append(_symbols.Current);
-                        isEnd = _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
-                    if (isEnd)
+                    if (isEndReached)
                         throw new LexerException("Unfinished string!");
 
                     wordBuilder.Append(_symbols.Current);
                     wordBuilder.Remove(wordBuilder.Length - 1, 1);
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Literal);
+                    yield return new Token(wordBuilder.ToString(), TokenType.Literal);
                 }
 
                 if (_symbols.Current == ';'
@@ -78,9 +82,9 @@ namespace ShellLang.Core
                     || _symbols.Current == ')')
                 {
                     wordBuilder.Append(_symbols.Current);
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.Separator);
+                    yield return new Token(wordBuilder.ToString(), TokenType.Separator);
                 }
 
                 if (_symbols.Current == '>'
@@ -90,21 +94,21 @@ namespace ShellLang.Core
                     || _symbols.Current == '-')
                 {
                     wordBuilder.Append(_symbols.Current);
-                    _symbols.MoveNext();
+                    isEndReached = _symbols.MoveNext();
 
                     if (_symbols.Current == '=')
                     {
                         wordBuilder.Append(_symbols.Current);
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
                     }
 
-                    yield return new KeyValuePair<string, Tag>(wordBuilder.ToString(), Tag.BinaryOperator);
+                    yield return new Token(wordBuilder.ToString(), TokenType.BinaryOperator);
                 }
 
                 if (_symbols.Current == '#')
                 {
                     while (_symbols.Current != '\n')
-                        _symbols.MoveNext();
+                        isEndReached = _symbols.MoveNext();
 
                     continue;
                 }

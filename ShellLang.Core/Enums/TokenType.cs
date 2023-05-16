@@ -1,8 +1,8 @@
 ﻿namespace ShellLang.Core.Enums
 {
-    public enum Tag
+    public enum TokenType
     {
-        Type,
+        ObjectType,
         Literal,
         Identifier,
         BinaryOperator,
