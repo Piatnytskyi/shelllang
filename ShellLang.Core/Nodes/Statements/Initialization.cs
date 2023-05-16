@@ -11,11 +11,6 @@
             _assign = assignment;
         }
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             _declaration.Evaluate(context);

@@ -15,11 +15,6 @@ namespace ShellLang.Core.Nodes.Statements
             _assignExpression = expression;
         }
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             if (!context.Variables.Contains(_variable))

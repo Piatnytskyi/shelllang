@@ -9,11 +9,6 @@ namespace ShellLang.Core.Nodes.Statements
         private IExpression _updateExpression;
         private BodyComposite _body;
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             Context localContext = (Context)context.Clone();

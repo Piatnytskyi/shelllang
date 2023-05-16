@@ -10,11 +10,6 @@ namespace ShellLang.Core.Nodes.Expressions
 
         public Entity Result { get; }
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             _leftHandExpression.Evaluate(context);

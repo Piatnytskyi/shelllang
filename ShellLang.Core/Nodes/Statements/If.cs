@@ -8,11 +8,6 @@ namespace ShellLang.Core.Nodes.Statements
         private BodyComposite _ifBody;
         private BodyComposite _elseBody;
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             _testExpression.Evaluate(context);

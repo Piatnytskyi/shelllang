@@ -7,11 +7,6 @@ namespace ShellLang.Core.Nodes.Statements
     {
         public Variable _variable;
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             if (!context.Variables.Contains(_variable))

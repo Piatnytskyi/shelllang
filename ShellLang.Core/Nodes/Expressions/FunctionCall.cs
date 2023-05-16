@@ -1,6 +1,5 @@
 ﻿using ShellLang.Core.Exceptions;
 using ShellLang.Core.Models;
-using ShellLang.Core.Nodes.Statements;
 
 namespace ShellLang.Core.Nodes.Expressions
 {
@@ -10,11 +9,6 @@ namespace ShellLang.Core.Nodes.Expressions
         private IExpression[] _argumentsExpressions;
 
         public Entity Result { get; }
-
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
 
         public void Evaluate(Context context)
         {

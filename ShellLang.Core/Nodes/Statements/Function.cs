@@ -6,11 +6,6 @@ namespace ShellLang.Core.Nodes.Statements
     {
         private Models.Function _function;
 
-        public INode Parse()
-        {
-            throw new NotImplementedException();
-        }
-
         public void Evaluate(Context context)
         {
             if (!context.Functions.Contains(_function))
